@@ -253,22 +253,31 @@ async function genAllReports() {
 
 async function genIncidentReport() {
   const response = await fetch(
-    "https://incidents.statsig.workers.dev/contents"
+    "contents"
   );
   if (response.ok) {
     const json = await response.json();
     try {
-      const activeDom = DOMPurify.sanitize(
-        marked.parse(json.active ? json.active : "No active incidents")
-      );
-      const inactiveDom = DOMPurify.sanitize(marked.parse(json.inactive));
+      const activeDom = DOMPurify.sanitize(marked.parse(json.active ? json.active : "No active incidents"));
+      const inactiveDom = DOMPurify.sanitize(marked.parse(json.inactive ? json.inactive : "No inactive incidents"));
+
       document.getElementById("activeIncidentReports").innerHTML = activeDom;
       document.getElementById("pastIncidentReports").innerHTML = inactiveDom;
 
+      var incidents = document.getElementById('incidents');
+
       if (json.active) {
         setTimeout(() => {
+          incidents.style.display = 'block';
           document.getElementById("incidents").scrollIntoView(true);
         }, 1000);
+      }
+      else
+      {
+        if (json.inactive)
+        {
+          incidents.style.display = 'block';
+        }
       }
     } catch (e) {
       console.log(e.message);
